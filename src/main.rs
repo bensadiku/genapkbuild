@@ -1,6 +1,5 @@
 mod file;
 mod makefile;
-mod tests;
 mod zip;
 
 use makefile::Androidmk;

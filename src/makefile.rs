@@ -43,9 +43,18 @@ impl Androidmk {
         let android_mk_path = apk_dir.join("Android.mk");
         // log(format!("Current Android.mk path: {:?}", &android_mk_path));
 
+        let mut name_string = name.into();
+        let input_string = input.into();
+
+        // If name supplied was empty, add it from the path
+        // See `only_input_empty_name` test
+        if name_string.is_empty() {
+            name_string = file::file_name(&input_string);
+        }
+
         let mut m = Self {
-            input: input.into(),
-            name: name.into(),
+            input: input_string,
+            name: name_string,
             default_architecture: default.into(),
             has_default_architecture: has_default,
             os: os.into(),
@@ -111,8 +120,16 @@ impl Androidmk {
         self.preopt_dex
     }
 
+    pub fn set_preopt_dex(&mut self, dex: bool) {
+        self.preopt_dex = dex;
+    }
+
     pub fn privileged(&self) -> bool {
         self.privileged
+    }
+
+    pub fn set_privileged(&mut self, priv_app: bool) {
+        self.privileged = priv_app
     }
 
     pub fn has_default_architecture(&self) -> bool {
@@ -148,7 +165,7 @@ impl Androidmk {
         file::gen_android_mk_con(self)
     }
 
-    /// Entry point to generating Android.mk 
+    /// Entry point to generating Android.mk
     /// Creates a Androidmk struct from input which then allows you..
     /// to read architectures supported, .so libraries and more
     pub fn get_make_file_input() -> Androidmk {

@@ -1,0 +1,3 @@
+[submodule "tests/data/APKTest"]
+	path = tests/data/APKTest
+	url = https://github.com/bensadiku/genandroidmk_rs_apk.git
