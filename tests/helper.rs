@@ -25,3 +25,16 @@ pub fn get_random_mk() -> Androidmk {
     );
     mk
 }
+
+pub fn get_by_name(name: &str) -> Androidmk {
+    let mk = Androidmk::new(
+        format!("tests/data/{}.apk", name), // input
+        name,                               // name
+        "",                                 // default_architecture
+        false,                              // has default architecture
+        "6.0",                              // (un-used) os version
+        false,                              // pre-optimize dex files
+        false,                              // priviledged
+    );
+    mk
+}
