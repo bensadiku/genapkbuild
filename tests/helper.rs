@@ -3,6 +3,7 @@
 #[allow(dead_code)]
 use std::fs::File;
 use std::io::prelude::*;
+use std::path::Path;
 
 use genandroidmk_rs::makefile::Androidmk;
 
@@ -22,6 +23,7 @@ pub fn get_random_mk() -> Androidmk {
         "6.0",                         // (un-used) os version
         false,                         // pre-optimize dex files
         false,                         // priviledged
+        false,                         // extract_so
     );
     mk
 }
@@ -35,6 +37,19 @@ pub fn get_by_name(name: &str) -> Androidmk {
         "6.0",                              // (un-used) os version
         false,                              // pre-optimize dex files
         false,                              // priviledged
+        false,                              // extract_so
     );
     mk
+}
+
+pub fn file_exists(path: &str) -> bool {
+    let so_path = Path::new(path);
+    if !so_path.exists() {
+        println!("Path {:?} does not exist", so_path);
+    }
+    return so_path.exists();
+}
+
+pub fn cleanup_path(path: &str) {
+    std::fs::remove_dir_all(path);
 }

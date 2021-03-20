@@ -27,6 +27,7 @@ fn more_than_one_architecture_panic() {
         "6.0",                         // (un-used) os version
         false,                         // pre-optimize dex files
         false,                         // priviledged
+        false,                         // if should extract .so libs
     );
 }
 

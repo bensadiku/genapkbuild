@@ -6,7 +6,8 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use super::file;
-use super::makefile::{Androidmk};
+use super::makefile::Androidmk;
+use super::zip::extract_zip;
 
 /// Return file name with extension from a path
 pub fn file_name_ext(path: &str) -> String {
@@ -74,8 +75,18 @@ pub fn gen_android_mk_con(mk: &Androidmk) {
         mk_file_content.push_str("\n");
         mk_file_content.push_str("LOCAL_PREBUILT_JNI_LIBS := \\\n");
 
+        let lib_type = if mk.extract_so() {
+            //TODO: maybe rm -rf * this dir before extracting?
+            extract_zip(mk);
+            // extracted libs
+            " lib"
+        } else {
+            // not extracted
+            " @lib"
+        };
+
         for key in native_libraries {
-            mk_file_content.push_str(&format!("  @lib/{}/{}", architecture, key));
+            mk_file_content.push_str(&format!("  {}/{}/{}", lib_type, architecture, key));
             mk_file_content.push_str(" \\\n");
         }
     } else {
@@ -92,7 +103,7 @@ pub fn gen_android_mk_con(mk: &Androidmk) {
     }
 }
 
-pub fn get_ndk_libs(file_names: Vec<String>) -> (Vec<String>,Vec<String>) {
+pub fn get_ndk_libs(file_names: Vec<String>) -> (Vec<String>, Vec<String>) {
     let re = Regex::new(r"^lib/(.*)/(.*\.so)$").unwrap();
     const SO_CAPTURE_SIZE: usize = 3;
     let mut architectures: Vec<String> = Vec::new();
@@ -113,7 +124,7 @@ pub fn get_ndk_libs(file_names: Vec<String>) -> (Vec<String>,Vec<String>) {
 
                 //log(format!("Path: {}, Arch: {}, Name: {}", &path, &arch, &name));
             } else {
-               println!("Unknown capture size");
+                println!("Unknown capture size");
             }
         }
     }

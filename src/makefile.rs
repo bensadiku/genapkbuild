@@ -16,6 +16,7 @@ pub struct Androidmk {
     os: String,
     preopt_dex: bool,
     privileged: bool,
+    extract_so: bool,
     android_mk_path: PathBuf,
     apk_path: PathBuf,
     libraries: Vec<String>,
@@ -31,6 +32,7 @@ impl Androidmk {
         os: O,
         preopt_dex: bool,
         privileged: bool,
+        extract_so: bool,
     ) -> Androidmk
     where
         I: Into<String>,
@@ -59,7 +61,8 @@ impl Androidmk {
             has_default_architecture: has_default,
             os: os.into(),
             preopt_dex: preopt_dex,
-            privileged: privileged.into(),
+            privileged: privileged,
+            extract_so: extract_so,
             android_mk_path: android_mk_path,
             apk_path: apk_dir,
             libraries: Vec::new(),
@@ -122,6 +125,14 @@ impl Androidmk {
 
     pub fn set_preopt_dex(&mut self, dex: bool) {
         self.preopt_dex = dex;
+    }
+
+    pub fn extract_so(&self) -> bool {
+        self.extract_so
+    }
+    
+    pub fn set_extract_so(&mut self, should_extract_so: bool) {
+        self.extract_so = should_extract_so;
     }
 
     pub fn privileged(&self) -> bool {
@@ -222,6 +233,13 @@ impl Androidmk {
                 .required(false)
                 .help("Make app privileged (priv-app)"),
         )
+        .arg(
+            Arg::with_name("extract")
+                .short("e")
+                .long("extract")
+                .required(false)
+                .help("Extract .so libs /lib/<abi>/lib<name>.so"),
+        )
         .get_matches();
 
         // Input path of the apk, should never be empty!
@@ -243,6 +261,8 @@ impl Androidmk {
         let os = matches.value_of("os").unwrap_or("6.0");
         // Privileged app
         let privileged = matches.is_present("privileged");
+        // Ability to extract .so libs onto the directory
+        let extract_so = matches.is_present("extract");
 
         let makefile = Androidmk::new(
             input,
@@ -252,6 +272,7 @@ impl Androidmk {
             os,
             dex_opt,
             privileged,
+            extract_so,
         );
         makefile
     }

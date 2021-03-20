@@ -28,6 +28,7 @@ fn only_input_empty_name() {
         "6.0",                         // (un-used) os version
         false,                         // pre-optimize dex files
         false,                         // priviledged
+        false,                         // extract .so libs
     );
     let _ret = mk.gen_android_mk();
     assert_eq!(mk_contains("LOCAL_SRC_FILES := multipleArch.apk"), true);
