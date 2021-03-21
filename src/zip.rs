@@ -39,10 +39,10 @@ pub fn extract_zip(mk: &Androidmk) {
     let default_architecture = mk.get_default_architecture();
     let input = &mk.get_input();
     let fname = std::path::Path::new(input);
-    println!(
+    mk.log(format!(
         "Extracting APK: {:?} for architecture {} ",
         fname, default_architecture
-    );
+    ));
 
     let file = fs::File::open(&fname).unwrap();
 
@@ -58,12 +58,12 @@ pub fn extract_zip(mk: &Androidmk) {
         {
             let comment = file.comment();
             if !comment.is_empty() {
-                println!("File {} comment: {}", i, comment);
+                mk.log(format!("File {} comment: {}", i, comment));
             }
         }
 
         if (&*file.name()).ends_with('/') {
-            println!("File {} extracted to \"{}\"", i, outpath.display());
+            mk.log(format!("File {} extracted to \"{}\"", i, outpath.display()));
             fs::create_dir_all(&outpath).unwrap();
         } else if (&*file.name()).ends_with(".so") {
             // Create directory if it does not exist and if the architecture matches
@@ -76,12 +76,12 @@ pub fn extract_zip(mk: &Androidmk) {
                     }
                     let mut outfile = fs::File::create(&outpath).unwrap();
                     io::copy(&mut file, &mut outfile).unwrap();
-                    println!(
+                    mk.log(format!(
                         "File {} extracted to \"{}\" ({} bytes)",
                         i,
                         outpath.display(),
                         file.size()
-                    );
+                    ));
                 } else {
                     continue;
                 }

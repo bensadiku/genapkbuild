@@ -24,6 +24,7 @@ pub fn get_random_mk() -> Androidmk {
         false,                         // pre-optimize dex files
         false,                         // priviledged
         false,                         // extract_so
+        true,                          // debug flag
     );
     mk
 }
@@ -38,6 +39,7 @@ pub fn get_by_name(name: &str) -> Androidmk {
         false,                              // pre-optimize dex files
         false,                              // priviledged
         false,                              // extract_so
+        true,                               // debug flag
     );
     mk
 }

@@ -2,7 +2,7 @@ use genandroidmk_rs::makefile::Androidmk;
 
 mod helper;
 
-use helper::{get_random_mk, mk_contains, get_by_name};
+use helper::{get_by_name, get_random_mk, mk_contains};
 
 // https://developer.android.com/studio/projects/gradle-external-native-builds#specify-abi
 
@@ -28,6 +28,7 @@ fn more_than_one_architecture_panic() {
         false,                         // pre-optimize dex files
         false,                         // priviledged
         false,                         // if should extract .so libs
+        true,                          // debug flag
     );
 }
 
@@ -57,7 +58,6 @@ fn default_x86() {
     assert_eq!(mk_contains("@lib/x86/libhello-jnicallback.so"), true);
 }
 
-
 #[test]
 fn default_x86_2() {
     let mk = get_by_name("x86_multiple_so");
@@ -71,5 +71,8 @@ fn default_armeabi_v7a() {
     let mk = get_by_name("armeabi-v7a");
     let _ret2 = mk.gen_android_mk();
     assert_eq!(mk.get_default_architecture(), "armeabi-v7a");
-    assert_eq!(mk_contains("@lib/armeabi-v7a/libhello-jnicallback.so"), true);
+    assert_eq!(
+        mk_contains("@lib/armeabi-v7a/libhello-jnicallback.so"),
+        true
+    );
 }

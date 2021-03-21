@@ -17,6 +17,7 @@ pub struct Androidmk {
     preopt_dex: bool,
     privileged: bool,
     extract_so: bool,
+    debug: bool,
     android_mk_path: PathBuf,
     apk_path: PathBuf,
     libraries: Vec<String>,
@@ -33,6 +34,7 @@ impl Androidmk {
         preopt_dex: bool,
         privileged: bool,
         extract_so: bool,
+        debug: bool,
     ) -> Androidmk
     where
         I: Into<String>,
@@ -63,6 +65,7 @@ impl Androidmk {
             preopt_dex: preopt_dex,
             privileged: privileged,
             extract_so: extract_so,
+            debug: debug,
             android_mk_path: android_mk_path,
             apk_path: apk_dir,
             libraries: Vec::new(),
@@ -84,7 +87,7 @@ impl Androidmk {
         if architectures.len() == 1 && !self.has_default_architecture() {
             let arch = architectures[0].clone();
             let msg = format!("Only one architecture, autochoosing {}", arch);
-            println!("{}", msg);
+            self.log(msg);
             self.set_default_architecture(arch);
         } else if architectures.len() > 1 && !self.has_default_architecture() {
             let msg = format!(
@@ -130,7 +133,6 @@ impl Androidmk {
     pub fn extract_so(&self) -> bool {
         self.extract_so
     }
-    
     pub fn set_extract_so(&mut self, should_extract_so: bool) {
         self.extract_so = should_extract_so;
     }
@@ -161,6 +163,23 @@ impl Androidmk {
 
     pub fn get_libraries(&self) -> Vec<String> {
         self.libraries.clone()
+    }
+
+    pub fn is_debug(&self) -> bool {
+        self.debug
+    }
+
+    pub fn set_debug(&mut self, debug: bool) {
+        self.debug = debug;
+    }
+
+    pub fn log<S>(&self, msg: S)
+    where
+        S: Into<String>,
+    {
+        if self.is_debug() {
+            println!("{:?}", msg.into());
+        }
     }
 
     pub fn parse_ndk_libs(&mut self) {
@@ -240,6 +259,13 @@ impl Androidmk {
                 .required(false)
                 .help("Extract .so libs /lib/<abi>/lib<name>.so"),
         )
+        .arg(
+            Arg::with_name("verbose")
+                .short("v")
+                .long("verbose")
+                .required(false)
+                .help("Enable verbose debug logging"),
+        )
         .get_matches();
 
         // Input path of the apk, should never be empty!
@@ -263,6 +289,8 @@ impl Androidmk {
         let privileged = matches.is_present("privileged");
         // Ability to extract .so libs onto the directory
         let extract_so = matches.is_present("extract");
+        // Enable logging
+        let debug = matches.is_present("verbose");
 
         let makefile = Androidmk::new(
             input,
@@ -273,6 +301,7 @@ impl Androidmk {
             dex_opt,
             privileged,
             extract_so,
+            debug,
         );
         makefile
     }

@@ -85,6 +85,7 @@ fn extract_multiple_libs() {
         false,                                           // pre-optimize dex files
         false,                                           // priviledged
         true,                                            // extract_so
+        true,                                            // debug flag
     );
     mk.gen_android_mk();
     let lib_so = "lib/x86/libhello-jnicallback.so";

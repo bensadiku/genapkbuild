@@ -90,7 +90,7 @@ pub fn gen_android_mk_con(mk: &Androidmk) {
             mk_file_content.push_str(" \\\n");
         }
     } else {
-        println!("No native libraries found!");
+        mk.log("No native libraries found!");
     }
 
     mk_file_content.push_str("\nLOCAL_MODULE_TARGET_ARCH := $(my_src_arch)\n");
