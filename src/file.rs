@@ -70,11 +70,11 @@ pub fn gen_android_mk_con(mk: &Androidmk) {
     mk_file_content.push_str(&format!("LOCAL_SRC_FILES := {}\n", apk_dir.display()));
 
     let native_libraries = mk.get_libraries();
-    let architecture = mk.get_default_architecture();
-    if native_libraries.len() > 0 {
-        mk_file_content.push_str("\n");
-        mk_file_content.push_str("LOCAL_PREBUILT_JNI_LIBS := \\\n");
-
+    let architectures = mk.get_architectures();
+    let lib_size = native_libraries.len();
+    
+    //If we have some native libs, start writing to makefile for them
+    if lib_size > 0 {
         let lib_type = if mk.extract_so() {
             //TODO: maybe rm -rf * this dir before extracting?
             extract_zip(mk);
@@ -85,9 +85,22 @@ pub fn gen_android_mk_con(mk: &Androidmk) {
             " @lib"
         };
 
-        for key in native_libraries {
-            mk_file_content.push_str(&format!("  {}/{}/{}", lib_type, architecture, key));
-            mk_file_content.push_str(" \\\n");
+        mk_file_content.push_str("\n");
+        mk_file_content.push_str("LOCAL_PREBUILT_JNI_LIBS := \\\n");
+
+        if mk.has_default_architecture() {
+            let default_arch = mk.get_default_architecture();
+            for lib in native_libraries {
+                mk_file_content.push_str(&format!("  {}/{}/{}", lib_type, default_arch, lib));
+                mk_file_content.push_str(" \\\n");
+            }
+        } else {
+            for arch in architectures {
+                for lib in &native_libraries {
+                    mk_file_content.push_str(&format!("  {}/{}/{}", lib_type, arch, lib));
+                    mk_file_content.push_str(" \\\n");
+                }
+            }
         }
     } else {
         mk.log("No native libraries found!");

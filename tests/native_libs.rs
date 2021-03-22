@@ -97,3 +97,61 @@ fn extract_multiple_libs() {
     assert_eq!(file_exists(lib_test_noop_so), false);
     cleanup_path("lib/");
 }
+
+#[test]
+fn extract_multiple_arch_libs() {
+    cleanup_path("lib/");
+    let mut mk = get_by_name("multipleArch");
+    mk.set_extract_so(true);
+    // mk.set_default_architecture("armeabi-v7a".into());
+    // mk.set_has_default_architecture(true);
+    mk.gen_android_mk();
+    let libhello_jnicallback_arm64_v8a = "lib/arm64-v8a/libhello-jnicallback.so";
+    let libhello_jnicallback_armeabi_v7a = "lib/armeabi-v7a/libhello-jnicallback.so";
+    let libhello_jnicallback_x86 = "lib/x86/libhello-jnicallback.so";
+    let libhello_jnicallback_x86_64 = "lib/x86_64/libhello-jnicallback.so";
+
+    assert_eq!(mk_contains(libhello_jnicallback_arm64_v8a), true);
+    assert_eq!(mk_contains(libhello_jnicallback_armeabi_v7a), true);
+    assert_eq!(mk_contains(libhello_jnicallback_x86), true);
+    assert_eq!(mk_contains(libhello_jnicallback_x86_64), true);
+    cleanup_path("lib/");
+}
+
+#[test]
+fn non_extract_multiple_arch_libs() {
+    cleanup_path("lib/");
+    let mut mk = get_by_name("multipleArch");
+    mk.set_extract_so(false);
+    mk.gen_android_mk();
+    let libhello_jnicallback_arm64_v8a = "@lib/arm64-v8a/libhello-jnicallback.so";
+    let libhello_jnicallback_armeabi_v7a = "@lib/armeabi-v7a/libhello-jnicallback.so";
+    let libhello_jnicallback_x86 = "@lib/x86/libhello-jnicallback.so";
+    let libhello_jnicallback_x86_64 = "@lib/x86_64/libhello-jnicallback.so";
+
+    assert_eq!(mk_contains(libhello_jnicallback_arm64_v8a), true);
+    assert_eq!(mk_contains(libhello_jnicallback_armeabi_v7a), true);
+    assert_eq!(mk_contains(libhello_jnicallback_x86), true);
+    assert_eq!(mk_contains(libhello_jnicallback_x86_64), true);
+    cleanup_path("lib/");
+}
+
+#[test]
+fn extract_single_arch_libs() {
+    cleanup_path("lib/");
+    let mut mk = get_by_name("x86_multiple_so");
+    mk.set_extract_so(true);
+    mk.set_default_architecture("x86".into());
+    mk.set_has_default_architecture(true);
+    mk.gen_android_mk();
+    let libhello_jnicallback_arm64_v8a = "lib/armeabi-v7a/libhello-jnicallback.so";
+    let libhello_jnicallback_armeabi_v7a = "lib/armeabi-v7a/libhello-jnicallback.so";
+    let libhello_jnicallback_x86 = "lib/x86/libhello-jnicallback.so";
+    let libhello_jnicallback_x86_64 = "lib/x86_64/libhello-jnicallback.so";
+
+    assert_eq!(mk_contains(libhello_jnicallback_arm64_v8a), false);
+    assert_eq!(mk_contains(libhello_jnicallback_armeabi_v7a), false);
+    assert_eq!(mk_contains(libhello_jnicallback_x86), true);
+    assert_eq!(mk_contains(libhello_jnicallback_x86_64), false);
+    cleanup_path("lib/");
+}
