@@ -82,6 +82,32 @@ impl Androidmk {
         self.parse_ndk_libs();
 
         let architectures: Vec<String> = self.get_architectures();
+
+        // If there's a default architecture supplied but it's not a valid one
+        // e.g a typo, exit immediately, see issue #1
+        // TODO, add capability to add multiple architectures comma separated
+        let valid_abis = vec![
+            "armeabi-v7a".into(),
+            "arm64-v8a".into(),
+            "x86".into(),
+            "x86_64".into(),
+        ];
+        let default = &self.default_architecture;
+        if self.has_default_architecture() && !valid_abis.contains(default) {
+            panic!(format!(
+                "{} is not a valid ABI, must be one of: {:?} ",
+                default, valid_abis
+            ));
+        }
+        // If the APK itself doesn't have the default architecture supplied even though it's valid ABI
+        // then at least generate a warning
+        else if self.has_default_architecture() && !architectures.contains(default) {
+            println!(
+                "\nWarning: Default architecture {} supplied but only {:?} exist in APK",
+                default, architectures
+            );
+        }
+
         // If there's only one architecture and we haven't specified a default one..
         // then autochose what we have
         if architectures.len() == 1 && !self.has_default_architecture() {
@@ -89,12 +115,6 @@ impl Androidmk {
             let msg = format!("Only one architecture, autochoosing {}", arch);
             self.log(msg);
             self.set_default_architecture(arch);
-        } else if architectures.len() > 1 && !self.has_default_architecture() {
-            let msg = format!(
-                "More than one architecture found. Use -a flag to pick one of the following {:?}",
-                architectures
-            );
-            panic!(msg);
         }
     }
 
@@ -143,6 +163,10 @@ impl Androidmk {
 
     pub fn set_privileged(&mut self, priv_app: bool) {
         self.privileged = priv_app
+    }
+
+    pub fn set_has_default_architecture(&mut self, has_def: bool) {
+        self.has_default_architecture = has_def;
     }
 
     pub fn has_default_architecture(&self) -> bool {

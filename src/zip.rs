@@ -39,10 +39,17 @@ pub fn extract_zip(mk: &Androidmk) {
     let default_architecture = mk.get_default_architecture();
     let input = &mk.get_input();
     let fname = std::path::Path::new(input);
-    mk.log(format!(
-        "Extracting APK: {:?} for architecture {} ",
-        fname, default_architecture
-    ));
+    if mk.has_default_architecture() {
+        mk.log(format!(
+            "Extracting: {:?} for architecture {} ",
+            fname, default_architecture
+        ));
+    } else {
+        mk.log(format!(
+            "Extracting: {:?} for architectures {:?} ",
+            fname, mk.get_architectures()
+        ));
+    }
 
     let file = fs::File::open(&fname).unwrap();
 
@@ -67,24 +74,28 @@ pub fn extract_zip(mk: &Androidmk) {
             fs::create_dir_all(&outpath).unwrap();
         } else if (&*file.name()).ends_with(".so") {
             // Create directory if it does not exist and if the architecture matches
-            // TODO: Panic if there's multiple abis and the default abi doesn't match any of them
             if let Some(p) = outpath.parent() {
-                let directory_arch = p.file_name().unwrap().to_str().unwrap();
-                if directory_arch == default_architecture {
-                    if !p.exists() {
-                        fs::create_dir_all(&p).unwrap();
+                // If we specified a default architecture, check if the one we're extracting matches
+                if mk.has_default_architecture() {
+                    let directory_arch = p.file_name().unwrap().to_str().unwrap();
+                    if directory_arch == default_architecture {
+                        if !p.exists() {
+                            fs::create_dir_all(&p).unwrap();
+                        }
+                    } else {
+                        continue
                     }
-                    let mut outfile = fs::File::create(&outpath).unwrap();
-                    io::copy(&mut file, &mut outfile).unwrap();
-                    mk.log(format!(
-                        "File {} extracted to \"{}\" ({} bytes)",
-                        i,
-                        outpath.display(),
-                        file.size()
-                    ));
                 } else {
-                    continue;
+                    fs::create_dir_all(&p).unwrap();
                 }
+                let mut outfile = fs::File::create(&outpath).unwrap();
+                io::copy(&mut file, &mut outfile).unwrap();
+                mk.log(format!(
+                    "File {} extracted to \"{}\" ({} bytes)",
+                    i,
+                    outpath.display(),
+                    file.size()
+                ));
             }
         } else {
             continue;
