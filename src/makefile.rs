@@ -6,12 +6,13 @@ use std::path::PathBuf;
 
 use super::file;
 use super::zip;
+use super::utils;
 
 #[derive(Debug, Clone)]
 pub struct Androidmk {
     input: String,
     name: String,
-    default_architecture: String,
+    default_architecture: Vec<String>,
     has_default_architecture: bool,
     os: String,
     preopt_dex: bool,
@@ -56,10 +57,12 @@ impl Androidmk {
             name_string = file::file_name(&input_string);
         }
 
+        let default_architectures = utils::input_to_abi_vec(&default.into());
+
         let mut m = Self {
             input: input_string,
             name: name_string,
-            default_architecture: default.into(),
+            default_architecture: default_architectures,
             has_default_architecture: has_default,
             os: os.into(),
             preopt_dex: preopt_dex,
@@ -83,38 +86,13 @@ impl Androidmk {
 
         let architectures: Vec<String> = self.get_architectures();
 
-        // If there's a default architecture supplied but it's not a valid one
-        // e.g a typo, exit immediately, see issue #1
-        // TODO, add capability to add multiple architectures comma separated
-        let valid_abis = vec![
-            "armeabi-v7a".into(),
-            "arm64-v8a".into(),
-            "x86".into(),
-            "x86_64".into(),
-        ];
-        let default = &self.default_architecture;
-        if self.has_default_architecture() && !valid_abis.contains(default) {
-            panic!(format!(
-                "{} is not a valid ABI, must be one of: {:?} ",
-                default, valid_abis
-            ));
-        }
-        // If the APK itself doesn't have the default architecture supplied even though it's valid ABI
-        // then at least generate a warning
-        else if self.has_default_architecture() && !architectures.contains(default) {
-            println!(
-                "\nWarning: Default architecture {} supplied but only {:?} exist in APK",
-                default, architectures
-            );
-        }
-
         // If there's only one architecture and we haven't specified a default one..
         // then autochose what we have
         if architectures.len() == 1 && !self.has_default_architecture() {
             let arch = architectures[0].clone();
             let msg = format!("Only one architecture, autochoosing {}", arch);
             self.log(msg);
-            self.set_default_architecture(arch);
+            self.set_default_architecture(architectures);
         }
     }
 
@@ -126,11 +104,11 @@ impl Androidmk {
         self.input.clone()
     }
 
-    pub fn get_default_architecture(&self) -> String {
+    pub fn get_default_architecture(&self) -> Vec<String> {
         self.default_architecture.clone()
     }
 
-    pub fn set_default_architecture(&mut self, default_architecture: String) {
+    pub fn set_default_architecture(&mut self, default_architecture: Vec<String>) {
         self.default_architecture = default_architecture;
     }
 
@@ -224,7 +202,7 @@ impl Androidmk {
     /// to read architectures supported, .so libraries and more
     pub fn get_make_file_input() -> Androidmk {
         let matches = App::new("Generate Android make files automatically for APK's")
-        .version("1.0")
+        .version("1.2.0")
         .author("Behxhet S. <bensadiku65@gmail.com>")
         .about(
             "Auto generates Android.mk with backwards compatibility before Android 5.0 and after ",
@@ -298,15 +276,14 @@ impl Androidmk {
         // Get file name without path or ext
         let name_buf = file::file_name(input);
         let name = matches.value_of("name").unwrap_or(&name_buf);
-        // Default archiceture
-        // TODO:(beni) Make this Option<> and others and write on mk only if they're set, don't assume defaults
-        let default_architecture = matches.value_of("architecture").unwrap_or("arm64-v8a");
+        // Default architecture
+        // If not supplied, it will add all architectures found in APK
+        let default_architecture = matches.value_of("architecture").unwrap_or("");
         // Did user specify a default architecture
         let has_default_architecture = matches.is_present("architecture");
         // Pre-optimization
         let dex_opt = matches.is_present("dexpreopt");
         // Default to 6.0+
-        // TODO:(beni) Implement KitKat style mk file logic
         // Un-used for now!
         let os = matches.value_of("os").unwrap_or("6.0");
         // Privileged app

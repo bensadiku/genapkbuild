@@ -139,9 +139,18 @@ fn non_extract_multiple_arch_libs() {
 #[test]
 fn extract_single_arch_libs() {
     cleanup_path("lib/");
-    let mut mk = get_by_name("x86_multiple_so");
+    let mut mk = Androidmk::new(
+        format!("tests/data/x86_multiple_so.apk"), // input
+        "x86_multiple_so",                         // name
+        "x86",                                     // default_architecture
+        true,                                      // has default architecture
+        "6.0",                                     // (un-used) os version
+        false,                                     // pre-optimize dex files
+        false,                                     // priviledged
+        false,                                     // extract_so
+        true,                                      // debug flag
+    );
     mk.set_extract_so(true);
-    mk.set_default_architecture("x86".into());
     mk.set_has_default_architecture(true);
     mk.gen_android_mk();
     let libhello_jnicallback_arm64_v8a = "lib/armeabi-v7a/libhello-jnicallback.so";
