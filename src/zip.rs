@@ -35,13 +35,13 @@ where
 }
 
 pub fn extract_zip(mk: &Androidmk) {
-    let default_architectures = mk.get_default_architecture();
+    let default_architectures = mk.get_default_architectures();
     let input = &mk.get_input();
     let fname = std::path::Path::new(input);
     if mk.has_default_architecture() {
         mk.log(format!(
             "Extracting: {:?} for architecture {:?} ",
-            fname, mk.get_default_architecture()
+            fname, mk.get_default_architectures()
         ));
     } else {
         mk.log(format!(

@@ -89,7 +89,7 @@ pub fn gen_android_mk_con(mk: &Androidmk) {
         // If we passed some architectures via cli, prioritize those
         // Else, use the architectures we found in APK
         let arch = if mk.has_default_architecture() {
-            mk.get_default_architecture()
+            mk.get_default_architectures()
         } else {
             mk.get_architectures()
         };

@@ -16,7 +16,7 @@ mod tests {
 
         let mk = get_random_mk();
         let _ret2 = mk.gen_android_mk();
-        assert_eq!(mk.get_default_architecture(),vec!["arm64-v8a"]);
+        assert_eq!(mk.get_default_architectures(),vec!["arm64-v8a"]);
         assert_eq!(mk.privileged(), false);
         assert_eq!(mk.get_preopt_dex(), false);
         assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT"), false);

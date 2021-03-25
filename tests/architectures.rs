@@ -37,7 +37,7 @@ fn invalid_abi_panic() {
 fn default_arch() {
     let mk = get_random_mk();
     let _ret2 = mk.gen_android_mk();
-    assert_eq!(mk.get_default_architecture(), vec!["arm64-v8a"]);
+    assert_eq!(mk.get_default_architectures(), vec!["arm64-v8a"]);
     assert_eq!(mk.has_default_architecture(), true);
     assert_eq!(mk_contains("@lib/arm64-v8a/libhello-jnicallback.so"), true);
 }
@@ -56,7 +56,7 @@ fn force_x86() {
         true,                                  // debug flag
     );
     let _ret2 = &mk.gen_android_mk();
-    assert_eq!(mk.get_default_architecture(), vec!["x86"]);
+    assert_eq!(mk.get_default_architectures(), vec!["x86"]);
     assert_eq!(mk_contains("@lib/x86/libhello-jnicallback.so"), true);
 }
 
@@ -64,7 +64,7 @@ fn force_x86() {
 fn default_x86() {
     let mk = get_by_name("x86");
     let _ret2 = mk.gen_android_mk();
-    assert_eq!(mk.get_default_architecture(), vec!["x86"]);
+    assert_eq!(mk.get_default_architectures(), vec!["x86"]);
     assert_eq!(mk_contains("@lib/x86/libhello-jnicallback.so"), true);
 }
 
@@ -72,7 +72,7 @@ fn default_x86() {
 fn default_x86_2() {
     let mk = get_by_name("x86_multiple_so");
     let _ret2 = mk.gen_android_mk();
-    assert_eq!(mk.get_default_architecture(), vec!["x86"]);
+    assert_eq!(mk.get_default_architectures(), vec!["x86"]);
     assert_eq!(mk_contains("@lib/x86/libhello-jnicallback.so"), true);
 }
 
@@ -80,7 +80,7 @@ fn default_x86_2() {
 fn default_armeabi_v7a() {
     let mk = get_by_name("armeabi-v7a");
     let _ret2 = mk.gen_android_mk();
-    assert_eq!(mk.get_default_architecture(), vec!["armeabi-v7a"]);
+    assert_eq!(mk.get_default_architectures(), vec!["armeabi-v7a"]);
     assert_eq!(
         mk_contains("@lib/armeabi-v7a/libhello-jnicallback.so"),
         true

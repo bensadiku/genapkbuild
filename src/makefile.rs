@@ -12,7 +12,7 @@ use super::utils;
 pub struct Androidmk {
     input: String,
     name: String,
-    default_architecture: Vec<String>,
+    default_architectures: Vec<String>,
     has_default_architecture: bool,
     os: String,
     preopt_dex: bool,
@@ -62,7 +62,7 @@ impl Androidmk {
         let mut m = Self {
             input: input_string,
             name: name_string,
-            default_architecture: default_architectures,
+            default_architectures: default_architectures,
             has_default_architecture: has_default,
             os: os.into(),
             preopt_dex: preopt_dex,
@@ -92,7 +92,7 @@ impl Androidmk {
             let arch = architectures[0].clone();
             let msg = format!("Only one architecture, autochoosing {}", arch);
             self.log(msg);
-            self.set_default_architecture(architectures);
+            self.set_default_architectures(architectures);
         }
     }
 
@@ -104,12 +104,12 @@ impl Androidmk {
         self.input.clone()
     }
 
-    pub fn get_default_architecture(&self) -> Vec<String> {
-        self.default_architecture.clone()
+    pub fn get_default_architectures(&self) -> Vec<String> {
+        self.default_architectures.clone()
     }
 
-    pub fn set_default_architecture(&mut self, default_architecture: Vec<String>) {
-        self.default_architecture = default_architecture;
+    pub fn set_default_architectures(&mut self, default_architectures: Vec<String>) {
+        self.default_architectures = default_architectures;
     }
 
     // pub fn get_os(&self) -> String {
