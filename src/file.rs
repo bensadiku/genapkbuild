@@ -93,10 +93,17 @@ pub fn gen_android_mk_con(mk: &Androidmk) {
         } else {
             mk.get_architectures()
         };
-        for archi in arch {
-            for lib in &native_libraries {
+
+        let arch_size = arch.len();
+        for (i, archi) in arch.iter().enumerate() {
+            for (j, lib) in native_libraries.iter().enumerate() {
                 mk_file_content.push_str(&format!("  {}/{}/{}", lib_type, archi, lib));
-                mk_file_content.push_str(" \\\n");
+                // If it's the last iteration, simply add a new line
+                if i+1 == arch_size && j+1 == lib_size {
+                    mk_file_content.push_str(" \n");
+                }  else {
+                    mk_file_content.push_str(" \\\n");
+                }
             }
         }
     } else {
