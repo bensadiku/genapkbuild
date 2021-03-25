@@ -3,7 +3,6 @@ use std::fs;
 use std::fs::File;
 use std::io;
 use std::io::{Read, Seek};
-use std::path::Path;
 use zip::read::ZipArchive;
 use zip::read::ZipFile;
 use zip::result::ZipResult;
@@ -36,13 +35,13 @@ where
 }
 
 pub fn extract_zip(mk: &Androidmk) {
-    let default_architecture = mk.get_default_architecture();
+    let default_architectures = mk.get_default_architectures();
     let input = &mk.get_input();
     let fname = std::path::Path::new(input);
     if mk.has_default_architecture() {
         mk.log(format!(
-            "Extracting: {:?} for architecture {} ",
-            fname, default_architecture
+            "Extracting: {:?} for architecture {:?} ",
+            fname, mk.get_default_architectures()
         ));
     } else {
         mk.log(format!(
@@ -77,8 +76,9 @@ pub fn extract_zip(mk: &Androidmk) {
             if let Some(p) = outpath.parent() {
                 // If we specified a default architecture, check if the one we're extracting matches
                 if mk.has_default_architecture() {
-                    let directory_arch = p.file_name().unwrap().to_str().unwrap();
-                    if directory_arch == default_architecture {
+                    // FIXME: This is super lazy.. 
+                    let directory_arch = p.file_name().unwrap().to_str().unwrap().to_string();
+                    if default_architectures.contains(&directory_arch) {
                         if !p.exists() {
                             fs::create_dir_all(&p).unwrap();
                         }
