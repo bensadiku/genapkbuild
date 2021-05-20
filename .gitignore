@@ -1,4 +1,6 @@
 /target
 /test
 Android.mk
+Android.bp
+BUILD
 /lib
