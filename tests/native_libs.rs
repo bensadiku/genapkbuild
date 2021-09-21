@@ -86,6 +86,7 @@ fn extract_multiple_libs() {
         false,                                           // priviledged
         true,                                            // extract_so
         true,                                            // debug flag
+        false,                                           // generate blueprint file
     );
     mk.gen_android_mk();
     let lib_so = "lib/x86/libhello-jnicallback.so";
@@ -149,6 +150,7 @@ fn extract_single_arch_libs() {
         false,                                     // priviledged
         false,                                     // extract_so
         true,                                      // debug flag
+        false,                                     // generate blueprint file
     );
     mk.set_extract_so(true);
     mk.set_has_default_architecture(true);

@@ -30,6 +30,7 @@ fn invalid_abi_panic() {
         false,                         // priviledged
         false,                         // if should extract .so libs
         true,                          // debug flag
+        false,                         // generate blueprint file
     );
 }
 
@@ -54,6 +55,7 @@ fn force_x86() {
         false,                                 // priviledged
         false,                                 // extract_so
         true,                                  // debug flag
+        false,                                 // generate blueprint file
     );
     let _ret2 = &mk.gen_android_mk();
     assert_eq!(mk.get_default_architectures(), vec!["x86"]);
@@ -118,6 +120,7 @@ fn multiple_arch_only_armeabi_v7a_extract() {
         false,                                  // priviledged
         false,                                  // extract_so
         true,                                   // debug flag
+        false,                                  // generate blueprint file
     );
     mk.set_extract_so(true);
     mk.set_has_default_architecture(true);

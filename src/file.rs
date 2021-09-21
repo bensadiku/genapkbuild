@@ -20,7 +20,7 @@ pub fn file_name_ext(path: &str) -> String {
     if let Some(name_string) = filename.to_str() {
         name_string.into()
     } else {
-        panic!(format!("Could not get file name for {:?}", filename));
+        panic!("Could not get file name for {:?}", filename);
     }
 }
 
@@ -35,7 +35,59 @@ pub fn file_name(path: &str) -> String {
     if let Some(name_string) = filename.to_str() {
         name_string.into()
     } else {
-        panic!(format!("Could not get file name for {:?}", filename));
+        panic!("Could not get file name for {:?}", filename);
+    }
+}
+
+pub fn gen_android_bp_con(app: &Androidmk) {
+    let bp_path = app.get_mk_path();
+    let display = bp_path.display();
+    let apk_dir: PathBuf = file::file_name_ext(&app.get_input()).into();
+
+    // Open a file in write-only mode, returns `io::Result<File>`
+    let mut file = match File::create(&app.get_mk_path()) {
+        Err(why) => panic!("Couldn't create {}: {}", display, why),
+        Ok(file) => file,
+    };
+
+    let native_libraries = app.get_libraries();
+    let lib_size = native_libraries.len();
+    //If we have some native libs, panic for now
+    if lib_size > 0 {
+        // FIXME: implement gen
+        panic!("BP generation for jni libs not supported yet see [https://github.com/bensadiku/genandroidmk_rs/issues/6]");
+    }
+
+    let bp = format!(
+        r#"android_app_import {{
+    name: {:#?},
+    srcs: [{:#?}],
+    certificate: "presigned",
+    privileged: {},
+    dex_preopt: {{
+        enabled: {},
+    }},
+}}
+    "#,
+        app.get_name(),
+        apk_dir.display(),
+        app.privileged(),
+        app.get_preopt_dex(),
+    );
+
+    // Write everything
+    match file.write_all(bp.as_bytes()) {
+        Err(why) => panic!("Couldn't write to {}: {}", display, why),
+        Ok(_) => println!("Successfully created Android.bp to {}", display),
+    }
+
+}
+
+pub fn remove_suffix<'a>(s: &'a str, p: &str) -> &'a str {
+    if s.ends_with(p) {
+        &s[..s.len() - p.len()]
+    } else {
+        s
     }
 }
 
@@ -99,9 +151,9 @@ pub fn gen_android_mk_con(mk: &Androidmk) {
             for (j, lib) in native_libraries.iter().enumerate() {
                 mk_file_content.push_str(&format!("  {}/{}/{}", lib_type, archi, lib));
                 // If it's the last iteration, simply add a new line
-                if i+1 == arch_size && j+1 == lib_size {
+                if i + 1 == arch_size && j + 1 == lib_size {
                     mk_file_content.push_str(" \n");
-                }  else {
+                } else {
                     mk_file_content.push_str(" \\\n");
                 }
             }

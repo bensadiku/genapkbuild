@@ -7,6 +7,8 @@ use std::path::Path;
 
 use genandroidmk_rs::makefile::Androidmk;
 
+// run with `cargo test -- --nocapture` for  the logs
+// run with `cargo test -- --test-threads=1` for single threaded tests
 pub fn mk_contains(data: &str) -> bool {
     let mut file = File::open("Android.mk").unwrap();
     let mut contents = String::new();
@@ -25,6 +27,7 @@ pub fn get_random_mk() -> Androidmk {
         false,                         // priviledged
         false,                         // extract_so
         true,                          // debug flag
+        false,                         // generate blueprint file
     );
     mk
 }
@@ -40,6 +43,7 @@ pub fn get_by_name(name: &str) -> Androidmk {
         false,                              // priviledged
         false,                              // extract_so
         true,                               // debug flag
+        false,                              // generate blueprint file
     );
     mk
 }

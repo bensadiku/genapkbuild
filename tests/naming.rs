@@ -30,6 +30,7 @@ fn only_input_empty_name() {
         false,                         // priviledged
         false,                         // extract .so libs
         true,                          // debug flag
+        false,                         // generate blueprint file
     );
     let _ret = mk.gen_android_mk();
     assert_eq!(mk_contains("LOCAL_SRC_FILES := multipleArch.apk"), true);

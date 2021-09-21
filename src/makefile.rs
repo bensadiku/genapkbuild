@@ -5,8 +5,8 @@ use std::env;
 use std::path::PathBuf;
 
 use super::file;
-use super::zip;
 use super::utils;
+use super::zip;
 
 #[derive(Debug, Clone)]
 pub struct Androidmk {
@@ -19,6 +19,7 @@ pub struct Androidmk {
     privileged: bool,
     extract_so: bool,
     debug: bool,
+    blueprint: bool,
     android_mk_path: PathBuf,
     apk_path: PathBuf,
     libraries: Vec<String>,
@@ -36,6 +37,7 @@ impl Androidmk {
         privileged: bool,
         extract_so: bool,
         debug: bool,
+        bp: bool,
     ) -> Androidmk
     where
         I: Into<String>,
@@ -45,7 +47,8 @@ impl Androidmk {
     {
         let apk_dir = env::current_dir().unwrap();
         //log(format!("Current dir: {:?}", apk_dir));
-        let android_mk_path = apk_dir.join("Android.mk");
+        let file_name = if bp { "Android.bp" } else { "Android.mk" };
+        let android_gen_path = apk_dir.join(file_name);
         // log(format!("Current Android.mk path: {:?}", &android_mk_path));
 
         let mut name_string = name.into();
@@ -69,7 +72,8 @@ impl Androidmk {
             privileged: privileged,
             extract_so: extract_so,
             debug: debug,
-            android_mk_path: android_mk_path,
+            blueprint: bp,
+            android_mk_path: android_gen_path,
             apk_path: apk_dir,
             libraries: Vec::new(),
             architectures: Vec::new(),
@@ -175,6 +179,14 @@ impl Androidmk {
         self.debug = debug;
     }
 
+    pub fn is_blueprint(&self) -> bool {
+        self.blueprint
+    }
+
+    pub fn set_blueprint(&mut self, blueprint: bool) {
+        self.blueprint = blueprint;
+    }
+
     pub fn log<S>(&self, msg: S)
     where
         S: Into<String>,
@@ -194,7 +206,11 @@ impl Androidmk {
 
     // TODO: return result
     pub fn gen_android_mk(&self) {
-        file::gen_android_mk_con(self)
+        if self.blueprint {
+            file::gen_android_bp_con(self);
+        } else {
+            file::gen_android_mk_con(self);
+        }
     }
 
     /// Entry point to generating Android.mk
@@ -212,7 +228,7 @@ impl Androidmk {
                 .short("i")
                 .long("input")
                 .required(true)
-                .help("Input APK file path you want to generate the mk")
+                .help("Input APK file path you want to generate the mk or bp")
                 .takes_value(true),
         )
         .arg(
@@ -220,7 +236,7 @@ impl Androidmk {
                 .short("n")
                 .long("name")
                 .required(false)
-                .help("Name of the APK file you want to generate the mk")
+                .help("Name of the APK file you want to generate the mk or bp")
                 .takes_value(true),
         )
         .arg(
@@ -236,7 +252,7 @@ impl Androidmk {
                 .short("o")
                 .long("os")
                 .required(false)
-                .help("Android OS version to generate the mk (semver)"),
+                .help("Android OS version to generate the mk/bp (semver)"),
         )
         .arg(
             Arg::with_name("dexpreopt")
@@ -268,6 +284,13 @@ impl Androidmk {
                 .required(false)
                 .help("Enable verbose debug logging"),
         )
+        .arg(
+            Arg::with_name("soong")
+                .short("s")
+                .long("soong")
+                .required(false)
+                .help("Generate Soong Android.bp files from Android apk"),
+        )
         .get_matches();
 
         // Input path of the apk, should never be empty!
@@ -292,6 +315,8 @@ impl Androidmk {
         let extract_so = matches.is_present("extract");
         // Enable logging
         let debug = matches.is_present("verbose");
+        // Generate blueprint for soong instead of makefile
+        let bp = matches.is_present("soong");
 
         let makefile = Androidmk::new(
             input,
@@ -303,6 +328,7 @@ impl Androidmk {
             privileged,
             extract_so,
             debug,
+            bp,
         );
         makefile
     }
