@@ -1,12 +1,18 @@
+mod build;
+mod cli;
 mod file;
-mod makefile;
 mod utils;
+mod makefile;
+mod blueprint;
 mod zip;
 
-use makefile::Androidmk;
+use build::BuildSystemBase;
+use cli::read_input;
 
+// TODO, use Result here since it maps to (EXIT_SUCCESS,EXIT_FAILURE) anyway
 fn main() {
-    let mk = Androidmk::get_make_file_input();
-  
-    let _ret2 = mk.gen_android_mk();
+    let base: BuildSystemBase = read_input();
+    let exit_code = base.generate();
+
+    std::process::exit(exit_code);
 }

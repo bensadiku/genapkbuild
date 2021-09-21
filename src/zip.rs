@@ -1,4 +1,4 @@
-use super::makefile::Androidmk;
+use super::makefile::MakeFile;
 use std::fs;
 use std::fs::File;
 use std::io;
@@ -13,14 +13,12 @@ pub fn run(path: &str) -> Vec<String> {
 
     match files {
         Ok(file) => {
-            // println!("{:?}", file);
             file
         }
         Err(e) => {
             panic!(" Panic {:?}", e);
         }
     }
-    // println!("{:?}", files);
 }
 
 fn browse_zip_archive<T, F, U>(buf: &mut T, browse_func: F) -> ZipResult<Vec<U>>
@@ -34,7 +32,7 @@ where
         .collect()
 }
 
-pub fn extract_zip(mk: &Androidmk) {
+pub fn extract_zip_mk(mk: &MakeFile) {
     let default_architectures = mk.get_default_architectures();
     let input = &mk.get_input();
     let fname = std::path::Path::new(input);
