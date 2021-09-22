@@ -94,8 +94,7 @@ pub fn read_input() -> BuildSystemBase {
     let input = matches.value_of("input").unwrap();
     // If empty, default to input
     // Get file name without path or ext
-    let name_buf = file::file_name(input);
-    let name = matches.value_of("name").unwrap_or(&name_buf);
+    let name = matches.value_of("name").unwrap_or("");
     // Default architecture
     // If not supplied, it will add all architectures found in APK
     let default_architectures = matches.value_of("architecture").unwrap_or("");

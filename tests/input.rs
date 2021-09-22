@@ -15,42 +15,48 @@ mod tests {
         println!("current_dir {:?}", current_dir);
 
         let mk = get_random_mk();
-        let _ret2 = mk.gen_android_mk();
-        assert_eq!(mk.get_default_architectures(),vec!["arm64-v8a"]);
+        let ret = mk.generate();
+        assert_eq!(mk.get_default_architectures(), vec!["arm64-v8a"]);
         assert_eq!(mk.privileged(), false);
         assert_eq!(mk.get_preopt_dex(), false);
         assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT"), false);
+        assert_eq!(ret, 0);
     }
     #[test]
     fn priviledged_tests() {
         let mut mk = get_random_mk();
         mk.set_privileged(true);
-        let _ret = mk.gen_android_mk();
+        let ret = mk.generate();
         assert_eq!(helper::mk_contains("LOCAL_PRIVILEGED_MODULE"), true);
+        assert_eq!(ret, 0);
 
         mk.set_privileged(false);
-        let _ret = mk.gen_android_mk();
+        let ret = mk.generate();
         assert_eq!(helper::mk_contains("LOCAL_PRIVILEGED_MODULE"), false);
+        assert_eq!(ret, 0);
     }
 
     #[test]
     fn pre_opt_dex_tests() {
         let mut mk = get_random_mk();
         mk.set_preopt_dex(true);
-        let _ret = mk.gen_android_mk();
+        let ret = mk.generate();
         assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT"), true);
+        assert_eq!(ret, 0);
 
         mk.set_preopt_dex(false);
-        let _ret = mk.gen_android_mk();
+        let _ret = mk.generate();
         assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT"), false);
+        assert_eq!(ret, 0);
     }
 
     #[test]
     fn native_so_tests() {
         let mk = get_random_mk();
-        let _ret = mk.gen_android_mk();
+        let ret = mk.generate();
         let so_files = vec!["libhello-jnicallback.so"];
         assert_eq!(mk.get_libraries(), so_files);
+        assert_eq!(ret, 0);
     }
 
     #[test]

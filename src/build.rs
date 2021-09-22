@@ -98,6 +98,17 @@ impl BuildSystemBase {
             self.log(msg);
             self.set_default_architectures(architectures);
         }
+        // If there's no name passed, override name with apk name
+        // If there's one passed, respect that
+        let input = self.get_input();
+        let name = self.get_name();
+        let default_name = if name.is_empty() {
+            let name_buf = file::file_name(&input);
+            name_buf
+        } else {
+            name
+        };
+        self.set_name(default_name);
     }
     pub fn parse_ndk_libs(&mut self) {
         let zip_files = zip::run(&self.input);
@@ -108,6 +119,13 @@ impl BuildSystemBase {
     }
     pub fn get_name(&self) -> String {
         self.name.clone()
+    }
+    pub fn set_name<N>(&mut self, name: N) -> &mut Self
+    where
+        N: Into<String>,
+    {
+        self.name = name.into();
+        self
     }
     pub fn get_input(&self) -> String {
         self.input.clone()
@@ -213,5 +231,86 @@ impl BuildSystemBase {
         T: BuildSystem,
     {
         system.generate()
+    }
+}
+
+impl Default for BuildSystemBase {
+    fn default() -> BuildSystemBase {
+        BuildSystemBase {
+            input: "tests/data/multipleArch.apk".into(),     // input
+            name: "multipleArch".into(),                     // name
+            default_architectures: vec!["arm64-v8a".into()], // default_architecture
+            has_default_architecture: false,                 // has default architecture
+            os: "6.0".into(),                                // (un-used) os version
+            preopt_dex: false,                               // pre-optimize dex files
+            privileged: false,                               // priviledged
+            libraries: Vec::new(),                           // JNI libraries found within APK
+            architectures: Vec::new(),                       // architectures found within APK
+            extract_so: false,                               // extract_so
+            debug: true,                                     // debug flag
+            blueprint: false,                                // generate blueprint Android.bp
+            makefile: true,                                  // generate makefile Android.mk
+            bazel: false,                                    // generate bazel BUILD
+        }
+    }
+}
+
+pub struct BuildSystemBaseBuilder {
+    base: BuildSystemBase,
+}
+
+impl BuildSystemBaseBuilder {
+    pub fn new() -> Self {
+        BuildSystemBaseBuilder {
+            base: BuildSystemBase::default(),
+        }
+    }
+    pub fn set_input<N>(&mut self, input: N) -> &mut Self
+    where
+        N: Into<String>,
+    {
+        self.base.input = input.into();
+        self
+    }
+    pub fn set_name<N>(&mut self, name: N) -> &mut Self
+    where
+        N: Into<String>,
+    {
+        self.base.name = name.into();
+        self
+    }
+    pub fn set_make_file(&mut self, is_make_file: bool) -> &mut Self {
+        self.base.makefile = is_make_file;
+        self
+    }
+    pub fn set_blueprint(&mut self, bp: bool) -> &mut Self {
+        self.base.blueprint = bp;
+        self
+    }
+    pub fn set_extract_so(&mut self, so: bool) -> &mut Self {
+        self.base.extract_so = so;
+        self
+    }
+    pub fn set_default_architectures(&mut self, default_architectures: Vec<String>) {
+        self.base.default_architectures = default_architectures;
+    }
+    pub fn get_default_architectures(&self) -> Vec<String> {
+        self.base.get_default_architectures()
+    }
+    pub fn set_has_default_architecture(&mut self, has_def: bool) {
+        self.base.has_default_architecture = has_def;
+    }
+    pub fn has_default_architecture(&self) -> bool {
+        self.base.has_default_architecture
+    }
+    // The way input receives it, as a string
+    pub fn override_arch(&mut self, arch: String) {
+        let default_architectures = utils::input_to_abi_vec(&arch);
+        self.set_default_architectures(default_architectures);
+        self.set_has_default_architecture(true);
+    }
+    pub fn build(&mut self) -> BuildSystemBase {
+        self.base.init();
+        self.base.clone()
     }
 }

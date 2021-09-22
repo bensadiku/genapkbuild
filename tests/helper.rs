@@ -1,11 +1,8 @@
-/// Helper methods for tests
-
-#[allow(dead_code)]
+use genandroidmk_rs::build::{BuildSystemBase, BuildSystemBaseBuilder};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-
-use genandroidmk_rs::makefile::Androidmk;
+// Helper methods for tests
 
 // run with `cargo test -- --nocapture` for  the logs
 // run with `cargo test -- --test-threads=1` for single threaded tests
@@ -16,36 +13,16 @@ pub fn mk_contains(data: &str) -> bool {
     return contents.contains(data);
 }
 
-pub fn get_random_mk() -> Androidmk {
-    let mk = Androidmk::new(
-        "tests/data/multipleArch.apk", // input
-        "multipleArch",                // name
-        "arm64-v8a",                   // default_architecture
-        true,                          // has default architecture
-        "6.0",                         // (un-used) os version
-        false,                         // pre-optimize dex files
-        false,                         // priviledged
-        false,                         // extract_so
-        true,                          // debug flag
-        false,                         // generate blueprint file
-    );
-    mk
+pub fn get_random_mk() -> BuildSystemBase {
+    let mut mk = BuildSystemBaseBuilder::new();
+    mk.build()
 }
 
-pub fn get_by_name(name: &str) -> Androidmk {
-    let mk = Androidmk::new(
-        format!("tests/data/{}.apk", name), // input
-        name,                               // name
-        "",                                 // default_architecture
-        false,                              // has default architecture
-        "6.0",                              // (un-used) os version
-        false,                              // pre-optimize dex files
-        false,                              // priviledged
-        false,                              // extract_so
-        true,                               // debug flag
-        false,                              // generate blueprint file
-    );
-    mk
+pub fn get_by_name(name: &str) -> BuildSystemBase {
+    let mut mk = BuildSystemBaseBuilder::new();
+    mk.set_input(format!("tests/data/{}.apk", name));
+    mk.set_name(name);
+    mk.build()
 }
 
 pub fn file_exists(path: &str) -> bool {
