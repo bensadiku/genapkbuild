@@ -33,7 +33,7 @@ impl BuildSystem for BluePrint {
         //If we have some native libs, panic for now
         if lib_size > 0 {
             // FIXME: implement gen
-            panic!("BP generation for jni libs not supported yet see [https://github.com/bensadiku/genandroidmk_rs/issues/6]");
+            panic!("BP generation for jni libs not supported yet see [https://github.com/bensadiku/genapkbuild/issues/6]");
         }
 
         let bp = format!(

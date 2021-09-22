@@ -1,4 +1,4 @@
-use genandroidmk_rs::build::{BuildSystemBase, BuildSystemBaseBuilder};
+use genapkbuild::build::{BuildSystemBase, BuildSystemBaseBuilder};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;

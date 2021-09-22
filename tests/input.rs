@@ -5,7 +5,7 @@ use helper::get_random_mk;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use genandroidmk_rs::utils::input_to_abi_vec;
+    use genapkbuild::utils::input_to_abi_vec;
 
     // run with `cargo test -- --nocapture` for  the logs
     // run with `cargo test -- --test-threads=1` for single threaded tests

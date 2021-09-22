@@ -1,5 +1,5 @@
 mod helper;
-use genandroidmk_rs::build::BuildSystemBaseBuilder;
+use genapkbuild::build::BuildSystemBaseBuilder;
 use helper::{cleanup_path, file_exists, get_by_name, mk_contains};
 
 #[test]

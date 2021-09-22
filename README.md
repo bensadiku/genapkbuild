@@ -1,21 +1,24 @@
- Generate Android Makefile
+ Generate AOSP build system files from APK
 =====
 
-A command-line tool to automatically generate `Android.mk` for Android apk-s.
+⚠️ This library is a Work in Progress! ⚠️
+
+A command-line tool to automatically generate `Android.mk` or `Android.bp` from Android APK-s.
+
+The genapkbuild tool will analyze APK for architectures, find NDK-generated libraries inside and generate makefile (`Android.mk`) or soong (`Android.bp`) for it. By default it will generate make files but it can be changed to generate soong files (Android.bp) by passing different flags.
 
 
-The genandroidmk tool will analyze apk for architectures, find NDK-generated libraries inside and generate a makefile for it.
+This tool supports pre Kit-Kat style makefile generation too, by extracting .so libraries from the APK and linking them into the makefile automatically. 
 
+See [flags below for more information](#Flags). 
 
-This tool supports pre Kit-Kat style makefile generation too, by extracting NDK libraries from the APK and linking them into the makefile automatically. See [flags below for more information](#Flags). 
-
-Ported from [go](https://github.com/northbright/genandroidmk) to rust with some more modifications, not backwards compatible with that tool.
+Inspired from northbright's tool written [Go](https://github.com/northbright/genandroidmk), ported to Rust and built on top of it, not backwards compatible with that tool (for the most part).
 
 ## Binaries
 
-If you have Rust compiler installed, simply clone and run `cargo build --release`. A binary `genandroidmk_rs` will generated in `target/release/`.
+If you have Rust compiler installed, simply clone and run `cargo build --release`. A binary `genapkbuild` will generated in `target/release/`.
 
-If you don't have the compiler installed, you can download the binary from the [release tab](https://github.com/bensadiku/genandroidmk_rs/releases)
+If you don't have the compiler installed, you can download the binary from the [release tab](https://github.com/bensadiku/genapkbuild/releases)
 
 
 ## Flags
@@ -26,6 +29,13 @@ If you don't have the compiler installed, you can download the binary from the [
 `-i --input <apk path>`
 
 This flag is required, it supplies the path of the APK we want to generate the makefile for.
+
+### Soong (Android.bp) flag
+---
+
+`-s --soong`
+
+This flag will create `Android.bp` instead of `Android.mk`
 
 ### Extract flag
 ---

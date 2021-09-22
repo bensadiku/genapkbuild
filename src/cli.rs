@@ -1,5 +1,4 @@
 extern crate clap;
-use super::file;
 use crate::build::BuildSystemBase;
 use clap::{App, Arg};
 

@@ -1,4 +1,4 @@
-use genandroidmk_rs::build::BuildSystemBaseBuilder;
+use genapkbuild::build::BuildSystemBaseBuilder;
 
 mod helper;
 

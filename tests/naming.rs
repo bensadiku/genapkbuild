@@ -1,7 +1,7 @@
 mod helper;
 
 use helper::{get_random_mk, mk_contains};
-use genandroidmk_rs::build::BuildSystemBaseBuilder;
+use genapkbuild::build::BuildSystemBaseBuilder;
 
 #[test]
 fn default_name() {
