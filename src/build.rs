@@ -21,7 +21,7 @@ pub struct BuildSystemBase {
     /// OS version (Unused remove?)
     os: String,
     /// To enable or disable pre-optimization
-    preopt_dex: bool,
+    preopt_dex: (bool, bool),
     /// Make an app privileged (priv-app)
     privileged: bool,
     /// JNI libs found on apk
@@ -47,7 +47,7 @@ impl BuildSystemBase {
         default: D,
         has_default: bool,
         os: O,
-        preopt_dex: bool,
+        preopt_dex: (bool, bool),
         privileged: bool,
         extract_so: bool,
         debug: bool,
@@ -147,12 +147,13 @@ impl BuildSystemBase {
         self.default_architectures = default_architectures;
     }
 
-    pub fn get_preopt_dex(&self) -> bool {
+    pub fn get_preopt_dex(&self) -> (bool, bool) {
         self.preopt_dex
     }
 
-    pub fn set_preopt_dex(&mut self, dex: bool) {
-        self.preopt_dex = dex;
+    pub fn set_preopt_dex(&mut self, dex: (bool, bool)) {
+        self.preopt_dex.0 = dex.0;
+        self.preopt_dex.1 = dex.1;
     }
 
     pub fn extract_so(&self) -> bool {
@@ -222,7 +223,7 @@ impl BuildSystemBase {
             let bp = self.new_bp();
             self.gen(bp)
         } else {
-            panic!("Not implemented!");
+            panic!("Bazel not implemented!");
         }
     }
 
@@ -242,7 +243,7 @@ impl Default for BuildSystemBase {
             default_architectures: vec!["arm64-v8a".into()], // default_architecture
             has_default_architecture: false,                 // has default architecture
             os: "6.0".into(),                                // (un-used) os version
-            preopt_dex: false,                               // pre-optimize dex files
+            preopt_dex: (false, false),                      // pre-optimize dex files
             privileged: false,                               // priviledged
             libraries: Vec::new(),                           // JNI libraries found within APK
             architectures: Vec::new(),                       // architectures found within APK

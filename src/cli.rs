@@ -9,9 +9,7 @@ pub fn read_input() -> BuildSystemBase {
     let matches = App::new("Generate Android.mk / Android.bp automatically from prebuilt APK's")
         .version("1.2.0")
         .author("Behxhet S. <bensadiku65@gmail.com>")
-        .about(
-            "Auto generates Android.mk with backwards compatibility before Android 5.0 and after ",
-        )
+        .about("Generate Android.mk or Android.bp from a prebuilt APK ")
         .arg(
             Arg::with_name("input")
                 .short("i")
@@ -48,9 +46,10 @@ pub fn read_input() -> BuildSystemBase {
                 .short("d")
                 .long("dex")
                 .required(false)
-                .help(
-                    "To enable or disable pre-optimization. Supports the values ‘true’ or ‘false’",
-                ),
+                .takes_value(true)
+                .possible_values(&["true", "false"])
+                .hide_possible_values(false)
+                .help("To enable or disable pre-optimization. "),
         )
         .arg(
             Arg::with_name("privileged")
@@ -99,8 +98,6 @@ pub fn read_input() -> BuildSystemBase {
     let default_architectures = matches.value_of("architecture").unwrap_or("");
     // Did user specify a default architecture
     let has_default_architecture = matches.is_present("architecture");
-    // Pre-optimization
-    let dex_opt = matches.is_present("dexpreopt");
     // Default to 6.0+
     // Un-used for now!
     let os = matches.value_of("os").unwrap_or("6.0");
@@ -117,13 +114,23 @@ pub fn read_input() -> BuildSystemBase {
     // Default selection is makefile
     let mk = if !bp && !bz { true } else { false };
 
+    // --dex supports the values ‘true’ or ‘false’ to enable or disable pre-optimization, respectively.
+    let has_dex_flag = matches.is_present("dexpreopt");
+    let dex_flag = matches.value_of("dexpreopt").unwrap_or("true");
+    let dex = (
+        // Was the flag passed at all?
+        has_dex_flag,
+        // If it was, what's the value?
+        dex_flag == "true",
+    );
+
     BuildSystemBase::new(
         input,
         name,
         default_architectures,
         has_default_architecture,
         os,
-        dex_opt,
+        dex,
         privileged,
         extract_so,
         debug,

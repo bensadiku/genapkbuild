@@ -64,7 +64,7 @@ This flag will make the apk a privileged system app located in priv-app.
 
 ### Dex Pre opt
 ---
-`-d --dex`
+`-d --dex <true or false>`
 
 Pre-optimization can also be enabled or disabled on an individual app basis by specifying this flag.
 

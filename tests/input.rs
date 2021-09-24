@@ -18,7 +18,8 @@ mod tests {
         let ret = mk.generate();
         assert_eq!(mk.get_default_architectures(), vec!["arm64-v8a"]);
         assert_eq!(mk.privileged(), false);
-        assert_eq!(mk.get_preopt_dex(), false);
+        assert_eq!(mk.get_preopt_dex().0, false);
+        assert_eq!(mk.get_preopt_dex().0, false);
         assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT"), false);
         assert_eq!(ret, 0);
     }
@@ -39,13 +40,18 @@ mod tests {
     #[test]
     fn pre_opt_dex_tests() {
         let mut mk = get_random_mk();
-        mk.set_preopt_dex(true);
+        mk.set_preopt_dex((true, true));
         let ret = mk.generate();
-        assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT"), true);
+        assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT := true"), true);
         assert_eq!(ret, 0);
 
-        mk.set_preopt_dex(false);
-        let _ret = mk.generate();
+        mk.set_preopt_dex((true, false));
+        let ret = mk.generate();
+        assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT := false"), true);
+        assert_eq!(ret, 0);
+
+        mk.set_preopt_dex((false, false));
+        let ret = mk.generate();
         assert_eq!(helper::mk_contains("LOCAL_DEX_PREOPT"), false);
         assert_eq!(ret, 0);
     }

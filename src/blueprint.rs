@@ -33,8 +33,18 @@ impl BuildSystem for BluePrint {
         //If we have some native libs, panic for now
         if lib_size > 0 {
             // FIXME: implement gen
-            panic!("BP generation for jni libs not supported yet see [https://github.com/bensadiku/genapkbuild/issues/6]");
+            println!("BP generation for jni libs not supported yet see [https://github.com/bensadiku/genapkbuild/issues/6]");
         }
+        let dex = if build_system.get_preopt_dex().0 {
+            format!(
+                r#"dex_preopt: {{
+        enabled: {},
+    }},"#,
+                build_system.get_preopt_dex().1
+            )
+        } else {
+            String::new()
+        };
 
         let bp = format!(
             r#"android_app_import {{
@@ -42,15 +52,13 @@ impl BuildSystem for BluePrint {
     srcs: [{:#?}],
     certificate: "presigned",
     privileged: {},
-    dex_preopt: {{
-        enabled: {},
-    }},
+    {}
 }}
     "#,
             build_system.get_name(),
             file_name_ext.display(),
             build_system.privileged(),
-            build_system.get_preopt_dex(),
+            dex,
         );
 
         // Write everything
