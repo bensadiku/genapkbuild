@@ -73,7 +73,6 @@ fn default_x86_2() {
 #[test]
 fn default_armeabi_v7a() {
     let mk = get_by_name("armeabi-v7a");
-    println!("benitest {:?}", mk.get_default_architectures());
     let ret = mk.generate();
     assert_eq!(ret, 0);
     assert_eq!(mk.get_default_architectures(), vec!["armeabi-v7a"]);

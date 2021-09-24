@@ -10,11 +10,25 @@ pub fn mk_contains(data: &str) -> bool {
     let mut file = File::open("Android.mk").unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
+    println!("mk_contains {}", contents);
     return contents.contains(data);
 }
-
+pub fn bp_contains(data: &str) -> bool {
+    let mut file = File::open("Android.bp").unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    println!("bp_contains {}", contents);
+    return contents.contains(data);
+}
 pub fn get_random_mk() -> BuildSystemBase {
     let mut mk = BuildSystemBaseBuilder::new();
+    mk.build()
+}
+
+pub fn get_random_bp() -> BuildSystemBase {
+    let mut mk = BuildSystemBaseBuilder::new();
+    mk.set_blueprint(true);
+    mk.set_make_file(false);
     mk.build()
 }
 

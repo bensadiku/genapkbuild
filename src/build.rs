@@ -204,6 +204,9 @@ impl BuildSystemBase {
     fn is_blueprint(&self) -> bool {
         self.blueprint
     }
+    fn set_blueprint(&mut self, is_blueprint: bool) {
+        self.blueprint = is_blueprint;
+    }
     fn is_make_file(&self) -> bool {
         self.makefile
     }
@@ -285,7 +288,7 @@ impl BuildSystemBaseBuilder {
         self
     }
     pub fn set_blueprint(&mut self, bp: bool) -> &mut Self {
-        self.base.blueprint = bp;
+        self.base.set_blueprint(bp);
         self
     }
     pub fn set_extract_so(&mut self, so: bool) -> &mut Self {

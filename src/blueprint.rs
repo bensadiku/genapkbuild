@@ -46,18 +46,24 @@ impl BuildSystem for BluePrint {
             String::new()
         };
 
+        let priv_app = if build_system.privileged() {
+            "privileged: true,"
+        } else {
+            ""
+        };
+
         let bp = format!(
             r#"android_app_import {{
     name: {:#?},
     srcs: [{:#?}],
     certificate: "presigned",
-    privileged: {},
+    {}
     {}
 }}
     "#,
             build_system.get_name(),
             file_name_ext.display(),
-            build_system.privileged(),
+            priv_app,
             dex,
         );
 
