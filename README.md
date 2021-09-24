@@ -16,7 +16,8 @@ Inspired from northbright's tool written [Go](https://github.com/northbright/gen
 
 ## Binaries
 
-If you have Rust compiler installed, simply clone and run `cargo build --release`. A binary `genapkbuild` will generated in `target/release/`.
+If you have Cargo installed, you can install this tool by running `cargo install genapkbuild`
+To build from source, you need Rust compiler, clone this repo and run `cargo build --release`. A binary `genapkbuild` will generated in `target/release/`.
 
 If you don't have the compiler installed, you can download the binary from the [release tab](https://github.com/bensadiku/genapkbuild/releases)
 

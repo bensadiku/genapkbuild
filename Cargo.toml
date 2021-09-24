@@ -1,6 +1,6 @@
 [package]
 name = "genapkbuild"
-version = "1.3.0"
+version = "1.4.0"
 readme = "README.md"
 repository = "https://github.com/bensadiku/genapkbuild"
 description = "A tool to generate Android APK build system files for AOSP"

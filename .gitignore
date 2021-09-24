@@ -4,3 +4,4 @@ Android.mk
 Android.bp
 BUILD
 /lib
+/tests/data
