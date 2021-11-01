@@ -1,6 +1,7 @@
 use regex::Regex;
 use std::ffi::OsStr;
 use std::path::Path;
+use super::utils::parse_abi_for_buildsystem;
 
 /// Return file name with extension from a path
 pub fn file_name_ext(path: &str) -> String {
@@ -32,7 +33,7 @@ pub fn file_name(path: &str) -> String {
     }
 }
 
-pub fn get_ndk_libs(file_names: Vec<String>) -> (Vec<String>, Vec<String>) {
+pub fn get_ndk_libs(file_names: Vec<String>, bp: bool) -> (Vec<String>, Vec<String>) {
     let re = Regex::new(r"^lib/(.*)/(.*\.so)$").unwrap();
     const SO_CAPTURE_SIZE: usize = 3;
     let mut architectures: Vec<String> = Vec::new();
@@ -59,8 +60,9 @@ pub fn get_ndk_libs(file_names: Vec<String>) -> (Vec<String>, Vec<String>) {
     }
     architectures.sort();
     architectures.dedup();
-
     so_paths.sort();
     so_paths.dedup();
-    (architectures, so_paths)
+
+    let abis = parse_abi_for_buildsystem(architectures, bp);
+    (abis, so_paths)
 }

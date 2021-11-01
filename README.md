@@ -29,7 +29,7 @@ If you don't have the compiler installed, you can download the binary from the [
 
 `-i --input <apk path>`
 
-This flag is required, it supplies the path of the APK we want to generate the makefile for.
+This flag is required, it supplies the path of the APK we want to generate the makefile or blueprint for.
 
 ### Soong (Android.bp) flag
 ---

@@ -61,7 +61,7 @@ impl BuildSystemBase {
         D: Into<String>,
         O: Into<String>,
     {
-        let default_architectures = utils::input_to_abi_vec(&default.into());
+        let default_architectures = utils::input_to_abi_vec(&default.into(), bp);
 
         let mut base = BuildSystemBase {
             input: input.into(),
@@ -112,7 +112,7 @@ impl BuildSystemBase {
     }
     pub fn parse_ndk_libs(&mut self) {
         let zip_files = zip::run(&self.input);
-        let (arch, so): (Vec<String>, Vec<String>) = file::get_ndk_libs(zip_files);
+        let (arch, so): (Vec<String>, Vec<String>) = file::get_ndk_libs(zip_files, self.blueprint);
 
         self.set_libraries(so);
         self.set_architectures(arch);
@@ -309,7 +309,7 @@ impl BuildSystemBaseBuilder {
     }
     // The way input receives it, as a string
     pub fn override_arch(&mut self, arch: String) {
-        let default_architectures = utils::input_to_abi_vec(&arch);
+        let default_architectures = utils::input_to_abi_vec(&arch, self.build().blueprint);
         self.set_default_architectures(default_architectures);
         self.set_has_default_architecture(true);
     }

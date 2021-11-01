@@ -107,7 +107,6 @@ mod tests {
         );
         assert_eq!(ret, 0);
 
-
         // Verify dex_preopt doesn't even exist in the output
         bp.set_preopt_dex((false, false));
         let ret = bp.generate();
@@ -144,7 +143,26 @@ mod tests {
     fn valid_architecture_input() {
         let multiple_arch_input = "armeabi-v7a,x86";
         let arch = vec!["armeabi-v7a", "x86"];
-        let parsed = input_to_abi_vec(multiple_arch_input);
+        let bp = false;
+        let parsed = input_to_abi_vec(multiple_arch_input, bp);
+        assert_eq!(arch, parsed);
+    }
+
+    #[test]
+    fn valid_architecture_input_bp() {
+        let multiple_arch_input = "armeabi-v7a,arm64-v8a,x86";
+        let arch = vec!["arm", "arm64", "x86"];
+        let bp = true;
+        let parsed = input_to_abi_vec(multiple_arch_input, bp);
+        assert_eq!(arch, parsed);
+    }
+
+    #[test]
+    fn valid_architecture_input_mk() {
+        let multiple_arch_input = "arm,arm64,x86";
+        let arch = vec!["armeabi-v7a", "arm64-v8a", "x86"];
+        let bp = false;
+        let parsed = input_to_abi_vec(multiple_arch_input, bp);
         assert_eq!(arch, parsed);
     }
 
@@ -153,7 +171,7 @@ mod tests {
     fn invalid_architecture_input() {
         let multiple_arch_input = "armeabi-v7a,x85";
         let arch = vec!["armeabi-v7a", "x86"];
-        let parsed = input_to_abi_vec(multiple_arch_input);
+        let parsed = input_to_abi_vec(multiple_arch_input, true);
         assert_eq!(arch, parsed);
     }
 }

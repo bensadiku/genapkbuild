@@ -13,6 +13,24 @@ pub struct BluePrint {
     pub build_system: BuildSystemBase,
 }
 
+impl BluePrint {
+    pub fn get_default_architectures(&self) -> Vec<String> {
+        self.build_system.get_default_architectures().clone()
+    }
+
+    pub fn get_name(&self) -> String {
+        self.build_system.get_name().clone()
+    }
+
+    pub fn has_default_architecture(&self) -> bool {
+        self.build_system.has_default_architecture()
+    }
+
+    pub fn get_architectures(&self) -> Vec<String> {
+        self.build_system.get_architectures().clone()
+    }
+}
+
 impl BuildSystem for BluePrint {
     fn generate(&self) -> i32 {
         let apk_dir = env::current_dir().unwrap();
@@ -28,13 +46,34 @@ impl BuildSystem for BluePrint {
             Ok(file) => file,
         };
 
-        let native_libraries = build_system.get_libraries();
-        let lib_size = native_libraries.len();
-        //If we have some native libs, panic for now
+        let mut jni_libs: String = String::new();
+
+        let lib_size = build_system.get_libraries().len();
+
+        // If we passed some architectures via cli, prioritize those
+        // Else, use the architectures we found in APK
+        let arch = if self.has_default_architecture() {
+            self.get_default_architectures()
+        } else {
+            self.get_architectures()
+        };
+
+        // TODO: Clean this up, it's unreadable, use r#
         if lib_size > 0 {
-            // FIXME: implement gen
-            println!("BP generation for jni libs not supported yet see [https://github.com/bensadiku/genapkbuild/issues/6]");
+            println!("Please place APK's inside /prebuilt/<arch>/ \nSee [https://github.com/bensadiku/genapkbuild/issues/6] \n");
+            jni_libs.push_str("\n\tarch: {");
+
+            for archi in &arch {
+                jni_libs.push_str(&format!("\n\t\t{}: {}", archi, "{"));
+                jni_libs.push_str("\n\t\t");
+                let path = &format!("\t{}/{}/{}.apk\",\n", "prebuilt", archi, self.get_name());
+
+                jni_libs.push_str(path);
+                jni_libs.push_str("\t\t},");
+            }
+            jni_libs.push_str("\n\t},");
         }
+
         let dex = if build_system.get_preopt_dex().0 {
             format!(
                 r#"dex_preopt: {{
@@ -59,12 +98,14 @@ impl BuildSystem for BluePrint {
     certificate: "presigned",
     {}
     {}
+    {}
 }}
     "#,
             build_system.get_name(),
             file_name_ext.display(),
             priv_app,
             dex,
+            jni_libs
         );
 
         // Write everything

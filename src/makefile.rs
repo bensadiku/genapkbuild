@@ -69,7 +69,7 @@ impl BuildSystem for MakeFile {
                 // not extracted
                 " @lib"
             };
-            jni_libs.push_str("\n");
+            jni_libs.push_str("\\\n");
             // If we passed some architectures via cli, prioritize those
             // Else, use the architectures we found in APK
             // TODO: These are redundant, pls clean up
